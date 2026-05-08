@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Algorithmique • Tronc Commun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,500&family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4ede1;
+  --bg-2:#ebe2d2;
+  --ink:#1d211f;
+  --ink-soft:#3d423f;
+  --muted:#6b6960;
+  --accent:#0c4a47;
+  --accent-2:#0f5d59;
+  --warm:#c2541f;
+  --warm-soft:#e89570;
+  --gold:#d4a857;
+  --line:#1d211f;
+  --paper:#fbf6ec;
+  --green:#2e6b3d;
+  --green-bg:#dbe9d8;
+  --red:#9a2a2a;
+  --red-bg:#f1d8d4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:'Manrope',sans-serif;font-size:16px;line-height:1.55;min-height:100vh;-webkit-font-smoothing:antialiased}
+body{
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(194,84,31,0.05), transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(12,74,71,0.06), transparent 50%);
+  background-attachment:fixed;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.app{max-width:780px;margin:0 auto;padding:32px 24px 64px;min-height:100vh;display:flex;flex-direction:column}
+
+/* ====== HEADER ====== */
+.brand{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;padding-bottom:18px;border-bottom:1.5px solid var(--ink)}
+.brand-left{display:flex;flex-direction:column;gap:2px}
+.brand-tag{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.brand-title{font-family:'Fraunces',serif;font-weight:600;font-size:22px;letter-spacing:-0.01em;line-height:1}
+.brand-right{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-align:right;letter-spacing:0.05em}
+
+/* ====== PROGRESS ====== */
+.progress-wrap{display:flex;align-items:center;gap:14px;margin-bottom:32px}
+.progress-track{flex:1;height:6px;background:var(--bg-2);border-radius:99px;position:relative;overflow:hidden;border:1px solid rgba(29,33,31,0.12)}
+.progress-fill{height:100%;background:var(--accent);border-radius:99px;transition:width 0.5s cubic-bezier(0.4,0,0.2,1);width:0}
+.progress-text{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);font-weight:500;min-width:48px;text-align:right}
+.difficulty-badge{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;padding:5px 10px;border-radius:99px;background:var(--bg-2);color:var(--ink);border:1px solid rgba(29,33,31,0.15)}
+.difficulty-badge.easy{background:#e6efd9;color:#3a5a1a;border-color:#3a5a1a40}
+.difficulty-badge.medium{background:#f4e4cc;color:#7a4d10;border-color:#7a4d1040}
+.difficulty-badge.hard{background:#f1d8d4;color:#7a2020;border-color:#7a202040}
+
+/* ====== START SCREEN ====== */
+.screen{flex:1;display:flex;flex-direction:column;animation:fadeIn 0.5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.start-screen{justify-content:center;text-align:center;padding:20px 0}
+.hero-eyebrow{font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:var(--warm);font-weight:700;margin-bottom:18px}
+.hero-title{font-family:'Fraunces',serif;font-size:clamp(40px,7vw,64px);font-weight:600;line-height:0.95;letter-spacing:-0.025em;margin-bottom:8px;font-variation-settings:'opsz' 144}
+.hero-title em{font-style:italic;color:var(--warm);font-weight:500}
+.hero-sub{font-family:'Fraunces',serif;font-style:italic;font-size:20px;color:var(--ink-soft);margin-bottom:36px;font-weight:400}
+.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:32px auto 40px;max-width:560px;border:1.5px solid var(--ink);background:var(--paper)}
+.meta-cell{padding:18px 14px;text-align:center;border-right:1px solid rgba(29,33,31,0.18)}
+.meta-cell:last-child{border-right:none}
+.meta-num{font-family:'Fraunces',serif;font-size:36px;font-weight:600;line-height:1;color:var(--accent)}
+.meta-lbl{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:6px}
+.start-btn{display:inline-flex;align-items:center;gap:12px;background:var(--ink);color:var(--paper);padding:18px 32px;font-size:15px;font-weight:600;letter-spacing:0.04em;border-radius:99px;transition:transform 0.2s,background 0.2s;font-family:inherit}
+.start-btn:hover{background:var(--accent);transform:translateY(-2px)}
+.start-btn .arrow{display:inline-block;transition:transform 0.3s}
+.start-btn:hover .arrow{transform:translateX(4px)}
+.start-foot{margin-top:24px;font-size:13px;color:var(--muted)}
+
+/* ====== QUESTION CARD ====== */
+.q-card{background:var(--paper);border:1.5px solid var(--ink);padding:32px 28px;margin-bottom:18px;position:relative;border-radius:4px;box-shadow:6px 6px 0 var(--ink)}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.2em;color:var(--muted);font-weight:600;margin-bottom:8px}
+.q-text{font-family:'Fraunces',serif;font-size:22px;line-height:1.35;font-weight:500;color:var(--ink);margin-bottom:22px;letter-spacing:-0.01em}
+
+.code-block{background:#1d211f;color:#e8e0cf;font-family:'JetBrains Mono',monospace;font-size:13.5px;padding:16px 18px;border-radius:6px;line-height:1.75;margin:14px 0 22px;overflow-x:auto;white-space:pre;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.05)}
+.code-block .kw{color:#e89570;font-weight:500}
+.code-block .str{color:#a8c987}
+.code-block .num{color:#d4a857}
+.code-block .cm{color:#7a8580;font-style:italic}
+
+/* TF buttons */
+.tf-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tf-btn{padding:24px;background:var(--bg-2);border:1.5px solid var(--ink);border-radius:6px;font-family:'Fraunces',serif;font-size:24px;font-weight:600;transition:all 0.2s;letter-spacing:-0.01em}
+.tf-btn:hover:not(.locked){background:var(--ink);color:var(--paper);transform:translateY(-2px)}
+.tf-btn.selected{background:var(--ink);color:var(--paper)}
+.tf-btn.correct{background:var(--green-bg);color:var(--green);border-color:var(--green)}
+.tf-btn.wrong{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+.tf-btn .ico{display:block;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;font-family:'Manrope';font-weight:700;margin-top:6px;opacity:0.6}
+
+/* MCQ options */
+.mcq-list{display:flex;flex-direction:column;gap:10px}
+.mcq-opt{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;background:var(--bg-2);border:1.5px solid rgba(29,33,31,0.2);border-radius:6px;text-align:left;font-size:15px;transition:all 0.18s;line-height:1.4}
+.mcq-opt:hover:not(.locked){border-color:var(--ink);background:var(--paper);transform:translateX(2px)}
+.mcq-opt.selected{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.mcq-opt.correct{background:var(--green-bg);color:var(--green);border-color:var(--green)}
+.mcq-opt.wrong{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+.mcq-letter{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;background:var(--paper);color:var(--ink);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--ink)}
+.mcq-opt.selected .mcq-letter{background:var(--paper);color:var(--ink)}
+.mcq-opt.correct .mcq-letter{background:var(--green);color:var(--paper);border-color:var(--green)}
+.mcq-opt.wrong .mcq-letter{background:var(--red);color:var(--paper);border-color:var(--red)}
+.mcq-content{flex:1;font-family:'JetBrains Mono',monospace;font-size:13.5px;white-space:pre-wrap;line-height:1.6}
+.mcq-content.prose{font-family:'Manrope';font-size:15px}
+
+/* Fill in blanks */
+.fillblank-text{font-family:'JetBrains Mono',monospace;font-size:14.5px;line-height:2.2;background:#1d211f;color:#e8e0cf;padding:18px 20px;border-radius:6px;margin-bottom:20px;white-space:pre-wrap}
+.fillblank-text .kw{color:#e89570}
+.fillblank-text .str{color:#a8c987}
+.blank{display:inline-block;min-width:90px;height:32px;border:2px dashed #d4a857;border-radius:4px;padding:2px 10px;text-align:center;vertical-align:middle;background:rgba(212,168,87,0.1);font-size:14px;line-height:28px;transition:all 0.2s}
+.blank.filled{background:#d4a857;color:#1d211f;border-style:solid;font-weight:600}
+.blank.correct{background:#a8c987;color:#1d211f;border-color:#a8c987;border-style:solid;font-weight:600}
+.blank.wrong{background:#e89570;color:#1d211f;border-color:#e89570;border-style:solid;font-weight:600}
+.tokens-zone{display:flex;flex-wrap:wrap;gap:8px;padding:14px;background:var(--bg-2);border:1.5px dashed var(--ink);border-radius:6px;min-height:60px;align-items:center;justify-content:center}
+.token{padding:8px 14px;background:var(--paper);border:1.5px solid var(--ink);border-radius:99px;font-family:'JetBrains Mono',monospace;font-size:13.5px;font-weight:500;cursor:grab;user-select:none;transition:all 0.15s}
+.token:hover:not(.used){background:var(--ink);color:var(--paper);transform:translateY(-2px)}
+.token.used{opacity:0.3;cursor:not-allowed;pointer-events:none}
+.token.dragging{opacity:0.5;cursor:grabbing}
+.fillblank-hint{font-size:12px;color:var(--muted);margin-top:10px;font-style:italic;text-align:center}
+
+/* Drag categorize */
+.cat-tokens{display:flex;flex-wrap:wrap;gap:10px;padding:16px;background:var(--bg-2);border:1.5px dashed var(--ink);border-radius:6px;margin-bottom:18px;min-height:64px;justify-content:center;align-items:center}
+.cat-token{padding:10px 18px;background:var(--paper);border:1.5px solid var(--ink);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;cursor:grab;user-select:none;transition:all 0.15s}
+.cat-token:hover{background:var(--ink);color:var(--paper);transform:translateY(-2px)}
+.cat-token.dragging{opacity:0.4}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cat-box{background:var(--bg-2);border:1.5px solid var(--ink);border-radius:6px;padding:14px;min-height:140px;display:flex;flex-direction:column;transition:background 0.2s}
+.cat-box.drag-over{background:var(--gold);border-style:dashed}
+.cat-box-title{font-family:'Fraunces',serif;font-size:14px;font-weight:600;color:var(--ink);text-align:center;padding-bottom:8px;border-bottom:1px solid rgba(29,33,31,0.2);margin-bottom:10px;letter-spacing:-0.01em}
+.cat-drops{display:flex;flex-direction:column;gap:6px;flex:1}
+.cat-drop-item{padding:6px 10px;background:var(--paper);border:1px solid var(--ink);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:13.5px;text-align:center;cursor:pointer;font-weight:600}
+.cat-drop-item.correct{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.cat-drop-item.wrong{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+
+/* Order drag */
+.order-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.order-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--paper);border:1.5px solid var(--ink);border-radius:6px;cursor:grab;user-select:none;transition:transform 0.18s,box-shadow 0.18s}
+.order-item:hover{box-shadow:3px 3px 0 var(--ink);transform:translate(-1px,-1px)}
+.order-item.dragging{opacity:0.4}
+.order-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);font-weight:600;min-width:24px}
+.order-content{flex:1;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500}
+.order-handle{color:var(--muted);font-size:18px;line-height:1}
+.order-item.correct{background:var(--green-bg);border-color:var(--green)}
+.order-item.wrong{background:var(--red-bg);border-color:var(--red)}
+
+/* ACTION BUTTONS */
+.action-row{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.btn{padding:13px 26px;font-size:14px;font-weight:600;letter-spacing:0.03em;border-radius:99px;transition:all 0.18s;font-family:inherit;border:1.5px solid var(--ink)}
+.btn-primary{background:var(--ink);color:var(--paper)}
+.btn-primary:hover:not(:disabled){background:var(--accent);border-color:var(--accent);transform:translateY(-2px)}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--ink)}
+.btn-ghost:hover{background:var(--ink);color:var(--paper)}
+
+/* FEEDBACK */
+.feedback{margin-top:20px;padding:18px 22px;border-radius:6px;border-left:5px solid;animation:slideIn 0.4s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.feedback.good{background:var(--green-bg);border-color:var(--green);color:#1c3d22}
+.feedback.bad{background:var(--red-bg);border-color:var(--red);color:#5a1818}
+.feedback-tag{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.feedback-text{font-size:14.5px;line-height:1.6}
+.feedback-text strong{font-weight:700}
+.feedback-text code{font-family:'JetBrains Mono',monospace;background:rgba(0,0,0,0.08);padding:1px 6px;border-radius:3px;font-size:13px}
+
+/* RESULT SCREEN */
+.result-screen{padding:20px 0;text-align:center;animation:fadeIn 0.6s ease}
+.result-eyebrow{font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:var(--warm);font-weight:700;margin-bottom:14px}
+.result-score{font-family:'Fraunces',serif;font-size:clamp(80px,18vw,140px);font-weight:600;line-height:0.9;letter-spacing:-0.04em;color:var(--accent);font-variation-settings:'opsz' 144}
+.result-score-total{font-size:0.5em;color:var(--muted);font-weight:400}
+.result-msg{font-family:'Fraunces',serif;font-style:italic;font-size:24px;color:var(--ink-soft);margin-top:8px;margin-bottom:32px}
+.result-breakdown{background:var(--paper);border:1.5px solid var(--ink);max-width:520px;margin:0 auto;text-align:left;border-radius:4px;overflow:hidden}
+.result-section{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid rgba(29,33,31,0.15)}
+.result-section:last-child{border-bottom:none}
+.result-section-label{display:flex;flex-direction:column;gap:2px}
+.result-section-name{font-family:'Fraunces',serif;font-size:16px;font-weight:600}
+.result-section-meta{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.result-section-score{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--accent)}
+.result-actions{margin-top:32px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* FOOTER */
+.app-foot{margin-top:auto;padding-top:32px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(29,33,31,0.15);font-size:11px;color:var(--muted);letter-spacing:0.05em;font-family:'JetBrains Mono',monospace}
+
+@media (max-width:600px){
+  .app{padding:20px 16px 40px}
+  .q-card{padding:22px 18px;box-shadow:4px 4px 0 var(--ink)}
+  .q-text{font-size:18px}
+  .meta-grid{grid-template-columns:1fr;max-width:280px}
+  .meta-cell{border-right:none;border-bottom:1px solid rgba(29,33,31,0.18)}
+  .meta-cell:last-child{border-bottom:none}
+  .cat-grid{grid-template-columns:1fr}
+  .tf-btn{font-size:20px;padding:18px}
+  .code-block{font-size:12px}
+  .mcq-content{font-size:12.5px}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="brand">
+    <div class="brand-left">
+      <span class="brand-tag">Tronc Commun • Module 3</span>
+      <span class="brand-title">Algorithmique & Programmation</span>
+    </div>
+    <div class="brand-right">QUIZ.10Q<br>v1.0</div>
+  </header>
+
+  <div id="root"></div>
+
+  <footer class="app-foot">
+    <span>// Made with ❤️ by ZN Abderrahim (CLAUDE)</span>
+    <span id="footStat">10 questions</span>
+  </footer>
+</div>
+
+<script>
+// ============ DATA ============
+const QUIZ = [
+  // Q1 — FACILE — V/F
+  {
+    id:1, type:'tf', diff:'easy',
+    text:"Une variable peut changer de valeur plusieurs fois pendant l'exécution d'un algorithme.",
+    correct:true,
+    feedback:{
+      ok:"Bravo. Contrairement à une <strong>constante</strong>, une variable est une « case mémoire » dont le contenu peut être modifié autant de fois que nécessaire grâce à l'instruction d'<strong>affectation (←)</strong>.",
+      ko:"Faux. Une variable peut être modifiée plusieurs fois grâce à l'instruction d'affectation (←). C'est justement ce qui la distingue d'une <strong>constante</strong>, dont la valeur est fixée une fois pour toutes."
+    }
+  },
+  // Q2 — FACILE — QCM
+  {
+    id:2, type:'mcq', diff:'easy',
+    text:"À quoi sert l'instruction <code>Lire(age)</code> dans un algorithme ?",
+    options:[
+      {label:"Afficher la valeur de age à l'écran", correct:false, fb:"Non — c'est l'instruction <code>Ecrire</code> qui affiche à l'écran. <code>Lire</code> fait l'inverse : elle reçoit une donnée."},
+      {label:"Demander une saisie au clavier et la stocker dans age", correct:true, fb:"Exact. <code>Lire</code> est l'instruction d'<strong>entrée</strong> : elle attend que l'utilisateur saisisse une valeur, puis place cette valeur dans la variable indiquée."},
+      {label:"Déclarer la variable age", correct:false, fb:"Non — la déclaration se fait dans la section <code>Variables</code> au début de l'algorithme, avec le type associé."},
+      {label:"Donner la valeur 0 à la variable age", correct:false, fb:"Non — pour attribuer une valeur fixe, on utilise l'<strong>affectation</strong> : <code>age ← 0</code>."}
+    ],
+    contentClass:'prose'
+  },
+  // Q3 — FACILE — Fill in blanks
+  {
+    id:3, type:'fill', diff:'easy',
+    text:"Un élève veut stocker une note de DS qui peut contenir des décimales (ex. 14,5). Complète la déclaration.",
+    template:"<span class='kw'>Algorithme</span> Note\n[BLANK1]\n   note : [BLANK2]\n<span class='kw'>Début</span>\n   <span class='kw'>Lire</span>(note)\n<span class='kw'>Fin</span>",
+    blanks:[
+      {id:'BLANK1', correct:'Variables'},
+      {id:'BLANK2', correct:'réel'}
+    ],
+    tokens:['Variables','Constantes','Procédure','réel','entier','chaîne','booléen'],
+    feedback:{
+      ok:"Excellent. Comme la note peut contenir des décimales, on utilise le type <code>réel</code>. La déclaration se fait sous le mot-clé <code>Variables</code>. Si la note était toujours un entier, on aurait choisi <code>entier</code>.",
+      ko:"Pas tout à fait. La bonne déclaration est <code>Variables</code> + <code>réel</code>. Comme une note peut contenir une virgule (14,5), le type <code>entier</code> ne convient pas — on doit choisir <code>réel</code>. <code>Variables</code> est le mot-clé qui introduit la zone de déclaration."
+    }
+  },
+  // Q4 — MOYEN — QCM trace
+  {
+    id:4, type:'mcq', diff:'medium',
+    text:"Trace cet algorithme. Quelles sont les valeurs <strong>finales</strong> de A et B ?",
+    code:"<span class='kw'>Variables</span>\n   A, B : <span class='kw'>entier</span>\n<span class='kw'>Début</span>\n   A ← <span class='num'>5</span>\n   B ← <span class='num'>3</span>\n   A ← B\n   B ← A\n<span class='kw'>Fin</span>",
+    options:[
+      {label:"A = 5 et B = 3", correct:false, fb:"Non — ce serait le cas si aucune affectation n'avait eu lieu. Trace ligne par ligne en t'arrêtant sur chaque ←."},
+      {label:"A = 3 et B = 5  (les valeurs ont été échangées)", correct:false, fb:"Erreur classique. Pour <strong>échanger</strong> deux variables, il faut une variable <strong>temporaire</strong>. Ici, après <code>A ← B</code>, A vaut 3, donc <code>B ← A</code> met B à 3 (et non 5)."},
+      {label:"A = 3 et B = 3", correct:true, fb:"Excellent. Trace : A=5, B=3, puis <code>A ← B</code> donne A=3, puis <code>B ← A</code> donne B=3 (puisque A vaut maintenant 3). Sans variable temporaire, on perd la valeur initiale de A."},
+      {label:"A = 5 et B = 5", correct:false, fb:"Non — la 3<sup>e</sup> ligne <code>A ← B</code> écrase la valeur 5 de A. Après cette ligne, A vaut 3."}
+    ],
+    contentClass:'prose'
+  },
+  // Q5 — MOYEN — Drag to category
+  {
+    id:5, type:'cat', diff:'medium',
+    text:"Glisse chaque opérateur dans la <strong>bonne catégorie</strong>.",
+    items:[
+      {id:'op1', label:'+', cat:'arith'},
+      {id:'op2', label:'MOD', cat:'arith'},
+      {id:'op3', label:'<', cat:'rel'},
+      {id:'op4', label:'≥', cat:'rel'},
+      {id:'op5', label:'ET', cat:'log'},
+      {id:'op6', label:'NON', cat:'log'}
+    ],
+    cats:[
+      {id:'arith', name:'Arithmétiques'},
+      {id:'rel', name:'Relationnels'},
+      {id:'log', name:'Logiques'}
+    ],
+    feedback:{
+      ok:"Parfait. Les <strong>arithmétiques</strong> (+, −, *, /, DIV, MOD) produisent un nombre. Les <strong>relationnels</strong> (&lt;, &gt;, =, ≠, ≤, ≥) comparent deux valeurs et donnent un booléen (vrai/faux). Les <strong>logiques</strong> (ET, OU, NON) combinent des booléens.",
+      ko:"Pas tout à fait. Le bon classement : <strong>+, MOD</strong> sont arithmétiques (produisent un nombre) ; <strong>&lt;, ≥</strong> sont relationnels (comparent et renvoient un booléen) ; <strong>ET, NON</strong> sont logiques (combinent des booléens). Le programme officiel demande de bien distinguer ces trois familles."
+    }
+  },
+  // Q6 — MOYEN — Fill in blanks
+  {
+    id:6, type:'fill', diff:'medium',
+    text:"Complète l'algorithme : il affiche « Admis » si la moyenne est ≥ 10, sinon « Refusé ».",
+    template:"<span class='kw'>Si</span> moyenne [BLANK1] <span class='num'>10</span> <span class='kw'>Alors</span>\n   <span class='kw'>Ecrire</span>([BLANK2])\n<span class='kw'>Sinon</span>\n   <span class='kw'>Ecrire</span>(<span class='str'>\"Refusé\"</span>)\n[BLANK3]",
+    blanks:[
+      {id:'BLANK1', correct:'≥'},
+      {id:'BLANK2', correct:'\"Admis\"'},
+      {id:'BLANK3', correct:'FinSi'}
+    ],
+    tokens:['=', '≥', '<', '\"Admis\"', '\"Refusé\"', 'Admis', 'FinSi', 'Fin', 'FinPour'],
+    feedback:{
+      ok:"Parfait. La condition <code>moyenne ≥ 10</code> teste si l'élève a la moyenne (≥ inclut 10). Le mot-clé <code>FinSi</code> est <strong>obligatoire</strong> pour fermer toute structure sélective. Et comme « Admis » est du texte, il s'écrit entre <strong>guillemets</strong>.",
+      ko:"Réponses attendues : <code>≥</code> &nbsp;|&nbsp; <code>\"Admis\"</code> &nbsp;|&nbsp; <code>FinSi</code>. Trois pièges classiques à retenir : utilise <code>≥</code> (et non <code>=</code> ou <code>&lt;</code>) car la moyenne est obtenue dès 10. Mets le texte entre guillemets : <code>\"Admis\"</code>. Et ferme toujours avec <code>FinSi</code> — pas <code>Fin</code> qui clôt l'algorithme entier."
+    }
+  },
+  // Q7 — MOYEN — V/F
+  {
+    id:7, type:'tf', diff:'medium',
+    text:"L'expression <code>(A &gt; 0) ET (A &lt; 10)</code> est <strong>vraie</strong> pour A = 10.",
+    correct:false,
+    feedback:{
+      ok:"Exact. Pour A = 10 : <code>(10 &gt; 0)</code> est vrai, mais <code>(10 &lt; 10)</code> est <strong>faux</strong> (l'inégalité est stricte). Avec l'opérateur <code>ET</code>, les <strong>deux</strong> conditions doivent être vraies — donc le résultat global est <strong>faux</strong>. Piège classique sur les bornes : <code>&lt;</code> exclut la valeur, <code>≤</code> l'inclut.",
+      ko:"Attention. Pour A = 10 : <code>(10 &gt; 0)</code> est vrai, mais <code>(10 &lt; 10)</code> est <strong>faux</strong> car l'inégalité est <strong>stricte</strong>. Avec <code>ET</code>, les deux conditions doivent être vraies. Le résultat est donc <strong>faux</strong>. Pour inclure 10, il faudrait écrire <code>(A ≤ 10)</code>."
+    }
+  },
+  // Q8 — DIFFICILE — QCM trace
+  {
+    id:8, type:'mcq', diff:'hard',
+    text:"Trace cet algorithme. Que va-t-il afficher ?",
+    code:"<span class='kw'>Variables</span>\n   x, y, z : <span class='kw'>entier</span>\n<span class='kw'>Début</span>\n   x ← <span class='num'>4</span>\n   y ← <span class='num'>7</span>\n   z ← x + y\n   x ← z − x\n   y ← z − x\n   <span class='kw'>Ecrire</span>(x, <span class='str'>\" \"</span>, y)\n<span class='kw'>Fin</span>",
+    options:[
+      {label:"4 7", correct:false, fb:"Non — l'algorithme effectue plusieurs affectations qui modifient x et y. Refais le trace en t'arrêtant après chaque ligne."},
+      {label:"7 4", correct:true, fb:"Excellent. Trace : x=4, y=7, z=11, puis x = 11−4 = 7, puis y = 11−7 = 4. C'est un <strong>échange de valeurs sans variable temporaire</strong> (technique d'algorithmique classique)."},
+      {label:"11 4", correct:false, fb:"Tu as oublié l'affectation <code>x ← z − x</code> (ligne 6). Après cette ligne, x ne vaut plus 4 mais 7."},
+      {label:"7 11", correct:false, fb:"Inversé. Vérifie l'ordre des affectations : x est mis à jour <strong>avant</strong> y, donc quand on calcule y = z − x, on utilise déjà la <strong>nouvelle</strong> valeur de x (7), pas l'ancienne."}
+    ],
+    contentClass:'prose'
+  },
+  // Q9 — DIFFICILE — Order
+  {
+    id:9, type:'order', diff:'hard',
+    text:"Remets dans le bon ordre les étapes de l'algorithme qui calcule et affiche le <strong>maximum</strong> entre deux nombres a et b.",
+    items:[
+      {id:'s1', label:'Lire(a, b)', pos:1},
+      {id:'s2', label:'Si a > b Alors', pos:2},
+      {id:'s3', label:'   max ← a', pos:3},
+      {id:'s4', label:'Sinon', pos:4},
+      {id:'s5', label:'   max ← b', pos:5},
+      {id:'s6', label:'FinSi', pos:6},
+      {id:'s7', label:'Ecrire("Max =", max)', pos:7}
+    ],
+    feedback:{
+      ok:"Bravo. Tout algorithme de ce type suit le même schéma : <strong>(1)</strong> saisir les données, <strong>(2)</strong> tester la condition avec <code>Si...Alors</code>, <strong>(3)</strong> traiter chaque cas (Alors / Sinon), <strong>(4)</strong> fermer avec <code>FinSi</code>, <strong>(5)</strong> afficher le résultat. Note : on affecte <code>max</code> à l'intérieur de <strong>chaque</strong> branche pour garantir qu'elle a toujours une valeur.",
+      ko:"Pas l'ordre attendu. La logique correcte : <strong>1.</strong> <code>Lire(a,b)</code> → <strong>2.</strong> <code>Si a&gt;b Alors</code> → <strong>3.</strong> <code>max ← a</code> → <strong>4.</strong> <code>Sinon</code> → <strong>5.</strong> <code>max ← b</code> → <strong>6.</strong> <code>FinSi</code> → <strong>7.</strong> <code>Ecrire(max)</code>. On ne peut pas afficher avant d'avoir testé, ni tester avant d'avoir lu les données."
+    }
+  },
+  // Q10 — DIFFICILE — QCM
+  {
+    id:10, type:'mcq', diff:'hard',
+    text:"Un algorithme doit afficher la mention selon la moyenne :<br>• &lt; 10 → « Refusé »  • [10 ; 12[ → « Passable »<br>• [12 ; 14[ → « Assez bien »  • ≥ 14 → « Bien »<br><br>Quelle structure est <strong>correcte</strong> ?",
+    options:[
+      {label:"Si moyenne ≥ 10 Alors Ecrire(\"Passable\") FinSi\nSi moyenne ≥ 12 Alors Ecrire(\"Assez bien\") FinSi\nSi moyenne ≥ 14 Alors Ecrire(\"Bien\") FinSi",
+       correct:false, fb:"Bug. Pour moyenne = 15, l'algorithme affiche <strong>trois</strong> mentions : « Passable » + « Assez bien » + « Bien ». Et « Refusé » n'apparaît jamais. Il faut une <strong>sélective imbriquée à choix multiple</strong> (Sinon Si...)."},
+      {label:"Si moyenne < 10 Alors Ecrire(\"Refusé\")\nSinon Si moyenne < 12 Alors Ecrire(\"Passable\")\nSinon Si moyenne < 14 Alors Ecrire(\"Assez bien\")\nSinon Ecrire(\"Bien\")\nFinSi",
+       correct:true, fb:"Parfait. C'est une <strong>sélective imbriquée à choix multiple</strong> (au programme du tronc commun). Dès qu'une condition est vraie, les autres branches sont ignorées. Pour moyenne = 15 : &lt;10 ? non, &lt;12 ? non, &lt;14 ? non → on tombe dans le <code>Sinon</code> final → « Bien ». Une seule mention, c'est le but."},
+      {label:"Si moyenne < 10 Alors Ecrire(\"Refusé\") FinSi\nSi moyenne < 12 Alors Ecrire(\"Passable\") FinSi\nSi moyenne < 14 Alors Ecrire(\"Assez bien\") FinSi\nSi moyenne ≥ 14 Alors Ecrire(\"Bien\") FinSi",
+       correct:false, fb:"Même type de bug que la proposition A. Pour moyenne = 8, l'algorithme affichera « Refusé » + « Passable » + « Assez bien ». Quatre <code>Si</code> indépendants ne s'excluent pas — il faut chaîner avec <code>Sinon Si</code>."},
+      {label:"Si moyenne ≥ 10 Alors Ecrire(\"Passable\")\nSinon Ecrire(\"Refusé\")\nFinSi",
+       correct:false, fb:"Trop simple. Cette structure ne gère que <strong>deux</strong> mentions, alors que le problème en demande <strong>quatre</strong>. « Assez bien » et « Bien » ne sont jamais affichés."}
+    ]
+  }
+];
+
+// ============ STATE ============
+let state = {
+  screen:'start',
+  qIndex:0,
+  answers:{},  // {qid: {correct: bool, response: any}}
+};
+
+const root = document.getElementById('root');
+const footStat = document.getElementById('footStat');
+
+// ============ RENDER ============
+function render(){
+  if(state.screen==='start') return renderStart();
+  if(state.screen==='quiz') return renderQuestion();
+  if(state.screen==='result') return renderResult();
+}
+
+function renderStart(){
+  root.innerHTML = `
+    <section class="screen start-screen">
+      <div class="hero-eyebrow">Évaluation formative</div>
+      <h1 class="hero-title">Algorithmique<br><em>au tronc commun</em></h1>
+      <p class="hero-sub">Dix questions pour tester ta démarche algorithmique.</p>
+      <div class="meta-grid">
+        <div class="meta-cell"><div class="meta-num">10</div><div class="meta-lbl">Questions</div></div>
+        <div class="meta-cell"><div class="meta-num">4</div><div class="meta-lbl">Types</div></div>
+        <div class="meta-cell"><div class="meta-num">~12</div><div class="meta-lbl">Minutes</div></div>
+      </div>
+      <button class="start-btn" id="startBtn">
+        Commencer le quiz <span class="arrow">→</span>
+      </button>
+      <div class="start-foot">QCM • Vrai/Faux • Texte à trous • Glisser-déposer</div>
+    </section>
+  `;
+  document.getElementById('startBtn').onclick = ()=>{
+    state.screen='quiz'; state.qIndex=0; render();
+  };
+  footStat.textContent = '10 questions';
+}
+
+function renderQuestion(){
+  const q = QUIZ[state.qIndex];
+  const total = QUIZ.length;
+  const progress = ((state.qIndex)/total)*100;
+  const diffMap = {easy:'Facile', medium:'Moyen', hard:'Difficile'};
+
+  const progressBar = `
+    <div class="progress-wrap">
+      <span class="difficulty-badge ${q.diff}">${diffMap[q.diff]}</span>
+      <div class="progress-track"><div class="progress-fill" style="width:${progress}%"></div></div>
+      <span class="progress-text">${state.qIndex+1} / ${total}</span>
+    </div>`;
+
+  let body = '';
+  if(q.type==='tf') body = renderTF(q);
+  else if(q.type==='mcq') body = renderMCQ(q);
+  else if(q.type==='fill') body = renderFill(q);
+  else if(q.type==='cat') body = renderCat(q);
+  else if(q.type==='order') body = renderOrder(q);
+
+  root.innerHTML = `
+    <section class="screen">
+      ${progressBar}
+      <div class="q-card">
+        <div class="q-num">QUESTION ${String(q.id).padStart(2,'0')}</div>
+        <div class="q-text">${q.text}</div>
+        ${q.code ? `<div class="code-block">${q.code}</div>` : ''}
+        ${body}
+        <div id="feedback"></div>
+        <div class="action-row">
+          <button class="btn btn-primary" id="actionBtn" disabled>Valider</button>
+        </div>
+      </div>
+    </section>
+  `;
+
+  if(q.type==='tf') wireTF(q);
+  if(q.type==='mcq') wireMCQ(q);
+  if(q.type==='fill') wireFill(q);
+  if(q.type==='cat') wireCat(q);
+  if(q.type==='order') wireOrder(q);
+
+  footStat.textContent = `Q ${state.qIndex+1} / ${total}`;
+}
+
+// ====== TF ======
+function renderTF(q){
+  return `
+    <div class="tf-row">
+      <button class="tf-btn" data-val="true">Vrai<span class="ico">— Oui</span></button>
+      <button class="tf-btn" data-val="false">Faux<span class="ico">— Non</span></button>
+    </div>
+  `;
+}
+function wireTF(q){
+  const btns = root.querySelectorAll('.tf-btn');
+  let selected = null;
+  btns.forEach(b=>{
+    b.onclick = ()=>{
+      if(b.classList.contains('locked')) return;
+      btns.forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      selected = b.dataset.val==='true';
+      enableAction();
+    };
+  });
+  document.getElementById('actionBtn').onclick = ()=>{
+    if(selected===null) return;
+    const isCorrect = selected===q.correct;
+    btns.forEach(x=>x.classList.add('locked'));
+    btns.forEach(x=>{
+      if(String(q.correct)===x.dataset.val) x.classList.add('correct');
+      else if(x.classList.contains('selected')) x.classList.add('wrong');
+    });
+    showFeedback(q, isCorrect);
+    state.answers[q.id]={correct:isCorrect, response:selected};
+    transitionToNext();
+  };
+}
+
+// ====== MCQ ======
+function renderMCQ(q){
+  return `
+    <div class="mcq-list">
+      ${q.options.map((opt,i)=>`
+        <button class="mcq-opt" data-i="${i}">
+          <span class="mcq-letter">${String.fromCharCode(65+i)}</span>
+          <span class="mcq-content${q.contentClass==='prose'?' prose':''}">${escapeHtml(opt.label)}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+function wireMCQ(q){
+  const btns = root.querySelectorAll('.mcq-opt');
+  let selectedIdx = null;
+  btns.forEach(b=>{
+    b.onclick = ()=>{
+      if(b.classList.contains('locked')) return;
+      btns.forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      selectedIdx = parseInt(b.dataset.i);
+      enableAction();
+    };
+  });
+  document.getElementById('actionBtn').onclick = ()=>{
+    if(selectedIdx===null) return;
+    const isCorrect = q.options[selectedIdx].correct;
+    btns.forEach(x=>x.classList.add('locked'));
+    btns.forEach((x,i)=>{
+      if(q.options[i].correct) x.classList.add('correct');
+      else if(i===selectedIdx) x.classList.add('wrong');
+    });
+    const fb = q.options[selectedIdx].fb;
+    showFeedback({feedback:{ok:fb, ko:fb}}, isCorrect);
+    state.answers[q.id]={correct:isCorrect, response:selectedIdx};
+    transitionToNext();
+  };
+}
+
+// ====== FILL ======
+function renderFill(q){
+  let html = q.template;
+  q.blanks.forEach(b=>{
+    html = html.replace(`[${b.id}]`, `<span class="blank" data-id="${b.id}" data-correct="${escapeAttr(b.correct)}">_____</span>`);
+  });
+  const tokensHtml = q.tokens.map(t=>`<span class="token" draggable="true" data-val="${escapeAttr(t)}">${escapeHtml(t)}</span>`).join('');
+  return `
+    <div class="fillblank-text">${html}</div>
+    <div class="tokens-zone" id="tokens">${tokensHtml}</div>
+    <div class="fillblank-hint">Glisse un mot dans chaque case — ou clique pour sélectionner puis clique sur la case.</div>
+  `;
+}
+function wireFill(q){
+  let activeToken = null;
+  const tokens = root.querySelectorAll('.token');
+  const blanks = root.querySelectorAll('.blank');
+
+  // Drag and drop
+  tokens.forEach(t=>{
+    t.addEventListener('dragstart', e=>{
+      if(t.classList.contains('used')) { e.preventDefault(); return; }
+      e.dataTransfer.setData('text/plain', t.dataset.val);
+      e.dataTransfer.setData('source', 'token');
+      t.classList.add('dragging');
+    });
+    t.addEventListener('dragend', ()=>t.classList.remove('dragging'));
+    t.addEventListener('click', ()=>{
+      if(t.classList.contains('used')) return;
+      tokens.forEach(x=>x.style.outline='');
+      if(activeToken===t){activeToken=null;return;}
+      activeToken = t;
+      t.style.outline='3px solid var(--gold)';
+    });
+  });
+
+  blanks.forEach(b=>{
+    b.addEventListener('dragover', e=>e.preventDefault());
+    b.addEventListener('drop', e=>{
+      e.preventDefault();
+      const val = e.dataTransfer.getData('text/plain');
+      placeInBlank(b, val);
+    });
+    b.addEventListener('click', ()=>{
+      if(activeToken){
+        placeInBlank(b, activeToken.dataset.val);
+        activeToken = null;
+        tokens.forEach(x=>x.style.outline='');
+      } else if(b.classList.contains('filled')) {
+        // remove from blank (return token)
+        const v = b.dataset.value;
+        const tok = Array.from(tokens).find(t=>t.dataset.val===v && t.classList.contains('used'));
+        if(tok) tok.classList.remove('used');
+        b.textContent='_____';
+        b.classList.remove('filled');
+        delete b.dataset.value;
+        checkComplete();
+      }
+    });
+  });
+
+  function placeInBlank(b, val){
+    if(b.classList.contains('locked')) return;
+    // If blank already filled, return previous token
+    if(b.dataset.value){
+      const prev = Array.from(tokens).find(t=>t.dataset.val===b.dataset.value && t.classList.contains('used'));
+      if(prev) prev.classList.remove('used');
+    }
+    b.textContent = val;
+    b.classList.add('filled');
+    b.dataset.value = val;
+    // mark token as used
+    const tok = Array.from(tokens).find(t=>t.dataset.val===val && !t.classList.contains('used'));
+    if(tok) tok.classList.add('used');
+    checkComplete();
+  }
+
+  function checkComplete(){
+    const allFilled = Array.from(blanks).every(b=>b.classList.contains('filled'));
+    if(allFilled) enableAction();
+  }
+
+  document.getElementById('actionBtn').onclick = ()=>{
+    let allRight = true;
+    blanks.forEach(b=>{
+      b.classList.add('locked');
+      const expected = b.dataset.correct;
+      const got = b.dataset.value;
+      if(expected===got) b.classList.add('correct');
+      else { b.classList.add('wrong'); allRight = false; }
+    });
+    tokens.forEach(t=>t.style.pointerEvents='none');
+    showFeedback(q, allRight);
+    state.answers[q.id]={correct:allRight, response:Array.from(blanks).map(b=>b.dataset.value)};
+    transitionToNext();
+  };
+}
+
+// ====== CATEGORIZE ======
+function renderCat(q){
+  const tokensHtml = q.items.map(it=>`<span class="cat-token" draggable="true" data-id="${it.id}">${escapeHtml(it.label)}</span>`).join('');
+  const catsHtml = q.cats.map(c=>`
+    <div class="cat-box" data-cat="${c.id}">
+      <div class="cat-box-title">${c.name}</div>
+      <div class="cat-drops" data-drops="${c.id}"></div>
+    </div>
+  `).join('');
+  return `
+    <div class="cat-tokens" id="catPool">${tokensHtml}</div>
+    <div class="cat-grid">${catsHtml}</div>
+  `;
+}
+function wireCat(q){
+  const pool = root.querySelector('#catPool');
+  const tokens = root.querySelectorAll('.cat-token');
+  const boxes = root.querySelectorAll('.cat-box');
+
+  tokens.forEach(t=>{
+    t.addEventListener('dragstart', e=>{
+      e.dataTransfer.setData('text/plain', t.dataset.id);
+      t.classList.add('dragging');
+    });
+    t.addEventListener('dragend', ()=>t.classList.remove('dragging'));
+  });
+
+  boxes.forEach(box=>{
+    box.addEventListener('dragover', e=>{e.preventDefault(); box.classList.add('drag-over');});
+    box.addEventListener('dragleave', ()=>box.classList.remove('drag-over'));
+    box.addEventListener('drop', e=>{
+      e.preventDefault();
+      box.classList.remove('drag-over');
+      const id = e.dataTransfer.getData('text/plain');
+      const tok = Array.from(tokens).find(t=>t.dataset.id===id);
+      if(!tok) return;
+      // place in box drops
+      const drop = box.querySelector('.cat-drops');
+      const item = document.createElement('div');
+      item.className='cat-drop-item';
+      item.dataset.id=id;
+      item.dataset.cat=box.dataset.cat;
+      item.textContent=tok.textContent;
+      item.onclick = ()=>{
+        if(item.classList.contains('locked')) return;
+        item.remove();
+        tok.style.display='inline-block';
+        checkAllPlaced();
+      };
+      drop.appendChild(item);
+      tok.style.display='none';
+      checkAllPlaced();
+    });
+  });
+
+  function checkAllPlaced(){
+    const allHidden = Array.from(tokens).every(t=>t.style.display==='none');
+    if(allHidden) enableAction();
+    else document.getElementById('actionBtn').disabled=true;
+  }
+
+  document.getElementById('actionBtn').onclick = ()=>{
+    let allRight = true;
+    root.querySelectorAll('.cat-drop-item').forEach(item=>{
+      item.classList.add('locked');
+      const it = q.items.find(x=>x.id===item.dataset.id);
+      if(it.cat===item.dataset.cat) item.classList.add('correct');
+      else { item.classList.add('wrong'); allRight=false; }
+    });
+    showFeedback(q, allRight);
+    state.answers[q.id]={correct:allRight};
+    transitionToNext();
+  };
+}
+
+// ====== ORDER ======
+function renderOrder(q){
+  // shuffle items
+  const shuffled = [...q.items].sort(()=>Math.random()-0.5);
+  const itemsHtml = shuffled.map(it=>`
+    <li class="order-item" draggable="true" data-id="${it.id}" data-pos="${it.pos}">
+      <span class="order-num"></span>
+      <span class="order-content">${escapeHtml(it.label)}</span>
+      <span class="order-handle">⋮⋮</span>
+    </li>
+  `).join('');
+  return `<ul class="order-list" id="orderList">${itemsHtml}</ul><div class="fillblank-hint">Fais glisser les lignes pour les remettre dans le bon ordre.</div>`;
+}
+function wireOrder(q){
+  const list = root.querySelector('#orderList');
+  const items = list.querySelectorAll('.order-item');
+  let dragged = null;
+
+  function updateNums(){
+    list.querySelectorAll('.order-item').forEach((it,i)=>{
+      it.querySelector('.order-num').textContent = String(i+1).padStart(2,'0');
+    });
+  }
+  updateNums();
+
+  items.forEach(it=>{
+    it.addEventListener('dragstart', e=>{
+      dragged = it;
+      it.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    it.addEventListener('dragend', ()=>{
+      it.classList.remove('dragging');
+      updateNums();
+    });
+    it.addEventListener('dragover', e=>{
+      e.preventDefault();
+      const rect = it.getBoundingClientRect();
+      const after = (e.clientY - rect.top) > rect.height/2;
+      if(after) it.parentNode.insertBefore(dragged, it.nextSibling);
+      else it.parentNode.insertBefore(dragged, it);
+    });
+  });
+
+  enableAction(); // can validate from start with current order
+
+  document.getElementById('actionBtn').onclick = ()=>{
+    let allRight = true;
+    list.querySelectorAll('.order-item').forEach((it,i)=>{
+      const expectedPos = i+1;
+      const actualPos = parseInt(it.dataset.pos);
+      it.draggable = false;
+      if(expectedPos===actualPos) it.classList.add('correct');
+      else { it.classList.add('wrong'); allRight = false; }
+    });
+    showFeedback(q, allRight);
+    state.answers[q.id]={correct:allRight};
+    transitionToNext();
+  };
+}
+
+// ====== HELPERS ======
+function enableAction(){ document.getElementById('actionBtn').disabled=false; }
+
+function showFeedback(q, ok){
+  const fb = document.getElementById('feedback');
+  const text = ok ? q.feedback.ok : q.feedback.ko;
+  fb.innerHTML = `
+    <div class="feedback ${ok?'good':'bad'}">
+      <div class="feedback-tag">${ok?'✓ CORRECT — POURQUOI':'✗ INCORRECT — EXPLICATION'}</div>
+      <div class="feedback-text">${text}</div>
+    </div>
+  `;
+}
+
+function transitionToNext(){
+  const btn = document.getElementById('actionBtn');
+  if(state.qIndex < QUIZ.length-1){
+    btn.textContent = 'Question suivante →';
+    btn.disabled = false;
+    btn.onclick = ()=>{
+      state.qIndex++;
+      render();
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+  } else {
+    btn.textContent = 'Voir les résultats →';
+    btn.disabled = false;
+    btn.onclick = ()=>{
+      state.screen='result';
+      render();
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+  }
+}
+
+function renderResult(){
+  const total = QUIZ.length;
+  const correct = Object.values(state.answers).filter(a=>a.correct).length;
+  const pct = Math.round(correct/total*100);
+
+  // breakdown by difficulty
+  const breakdown = {easy:{ok:0,total:0,name:'Niveau facile',meta:'Vocabulaire & reconnaissance'},
+                    medium:{ok:0,total:0,name:'Niveau moyen',meta:'Application'},
+                    hard:{ok:0,total:0,name:'Niveau difficile',meta:'Analyse & trace'}};
+  QUIZ.forEach(q=>{
+    breakdown[q.diff].total++;
+    if(state.answers[q.id]?.correct) breakdown[q.diff].ok++;
+  });
+
+  let msg;
+  if(pct===100) msg="Sans-faute. Maîtrise complète du module.";
+  else if(pct>=80) msg="Très bonne maîtrise des concepts.";
+  else if(pct>=60) msg="Notions acquises — encore quelques zones à consolider.";
+  else if(pct>=40) msg="Concepts à revoir, surtout sur la trace et les structures sélectives.";
+  else msg="Reprends le cours sur l'algorithmique avant de retenter le quiz.";
+
+  root.innerHTML = `
+    <section class="screen result-screen">
+      <div class="result-eyebrow">Résultat final</div>
+      <div class="result-score">${correct}<span class="result-score-total">/${total}</span></div>
+      <div class="result-msg">${msg}</div>
+
+      <div class="result-breakdown">
+        ${Object.entries(breakdown).map(([k,v])=>`
+          <div class="result-section">
+            <div class="result-section-label">
+              <span class="result-section-name">${v.name}</span>
+              <span class="result-section-meta">${v.meta}</span>
+            </div>
+            <div class="result-section-score">${v.ok} / ${v.total}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="result-actions">
+        <button class="btn btn-primary" id="restartBtn">Recommencer le quiz</button>
+        <button class="btn btn-ghost" id="reviewBtn">Revoir mes réponses</button>
+      </div>
+    </section>
+  `;
+
+  document.getElementById('restartBtn').onclick = ()=>{
+    state = {screen:'start', qIndex:0, answers:{}};
+    render();
+  };
+  document.getElementById('reviewBtn').onclick = ()=>{
+    state.screen='quiz'; state.qIndex=0;
+    state.answers = {}; // reset to allow re-doing
+    render();
+  };
+
+  footStat.textContent = `Score : ${correct}/${total} (${pct}%)`;
+}
+
+function escapeHtml(s){
+  if(typeof s!=='string') return s;
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escapeAttr(s){
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+}
+
+// ============ INIT ============
+render();
+</script>
+</body>
+</html>
