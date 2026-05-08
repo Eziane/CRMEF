@@ -8,14 +8,14 @@ var running = false;
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// ── state queries ──────────────────────────────────────────────────────────
+// ── state queries (use the global currentChallenge set by main.js) ─────────
 function inBounds(x, y) {
-  const lvl = LEVELS[currentLevel];
-  return x >= 0 && x < lvl.cols && y >= 0 && y < lvl.rows;
+  return x >= 0 && x < currentChallenge.cols &&
+         y >= 0 && y < currentChallenge.rows;
 }
 
 function isWall(x, y) {
-  return LEVELS[currentLevel].walls.some(w => w.x === x && w.y === y);
+  return currentChallenge.walls.some(w => w.x === x && w.y === y);
 }
 
 function frontCell(state) {
@@ -31,20 +31,24 @@ function pathClear(state) {
 
 // ── robot init ─────────────────────────────────────────────────────────────
 function resetRobot() {
-  const s = LEVELS[currentLevel].start;
+  const s = currentChallenge.start;
   robot = { x: s.x, y: s.y, dir: s.dir };
   drawGame();
 }
 
 // ── canvas drawing ─────────────────────────────────────────────────────────
 function drawGame() {
-  const lvl  = LEVELS[currentLevel];
+  const lvl  = currentChallenge;
   const W    = canvas.width;
   const H    = canvas.height;
   const pad  = 14;
-  const cell = Math.floor(Math.min((W - pad * 2) / lvl.cols, (H - pad * 2) / lvl.rows));
-  const offX = (W - cell * lvl.cols) / 2;
-  const offY = (H - cell * lvl.rows) / 2;
+  // Cap cell size so single-row grids don't produce a giant robot
+  const cell = Math.min(
+    Math.floor(Math.min((W - pad * 2) / lvl.cols, (H - pad * 2) / lvl.rows)),
+    64
+  );
+  const offX = Math.round((W - cell * lvl.cols) / 2);
+  const offY = Math.round((H - cell * lvl.rows) / 2);
 
   ctx.clearRect(0, 0, W, H);
 
@@ -110,17 +114,14 @@ function drawRobot(cx, cy, r, dir) {
   ctx.translate(cx, cy);
   ctx.rotate(dir * Math.PI / 2);
 
-  // shadow
   ctx.fillStyle = 'rgba(14,26,43,.18)';
   ctx.beginPath();
   ctx.ellipse(0, r * 0.7, r * 0.7, r * 0.18, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // body
   const w = r * 1.4, h = r * 1.5;
   roundRect(-w / 2, -h / 2 + r * 0.08, w, h, r * 0.22, '#3B6BC9', '#0E1A2B');
 
-  // direction fin
   ctx.beginPath();
   ctx.moveTo(0, -h / 2 - r * 0.18);
   ctx.lineTo(-r * 0.28, -h / 2 + r * 0.05);
@@ -132,16 +133,14 @@ function drawRobot(cx, cy, r, dir) {
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  // visor
   roundRect(-w / 2 + r * 0.18, -h / 2 + r * 0.32, w - r * 0.36, h * 0.32, r * 0.1, '#0E1A2B', null);
   ctx.fillStyle = '#7CCDF7';
-  ctx.fillRect(-r * 0.4, -h / 2 + r * 0.45, r * 0.25, r * 0.18);
+  ctx.fillRect(-r * 0.4,  -h / 2 + r * 0.45, r * 0.25, r * 0.18);
   ctx.fillRect( r * 0.15, -h / 2 + r * 0.45, r * 0.25, r * 0.18);
   ctx.fillStyle = '#0E1A2B';
-  ctx.fillRect(-r * 0.3, -h / 2 + r * 0.5, r * 0.08, r * 0.08);
+  ctx.fillRect(-r * 0.3,  -h / 2 + r * 0.5, r * 0.08, r * 0.08);
   ctx.fillRect( r * 0.22, -h / 2 + r * 0.5, r * 0.08, r * 0.08);
 
-  // chest LED
   ctx.fillStyle = '#FFD54A';
   ctx.beginPath();
   ctx.arc(0, r * 0.18, r * 0.12, 0, Math.PI * 2);
@@ -186,12 +185,10 @@ async function runProgram() {
     return;
   }
 
-  const lvl = LEVELS[currentLevel];
-  if (robot.x === lvl.goal.x && robot.y === lvl.goal.y) {
+  const g = currentChallenge.goal;
+  if (robot.x === g.x && robot.y === g.y) {
     setStatus('success', 'Le robot a atteint la cible. Excellent !');
-    completed.add(currentLevel);
-    refreshStepperDots();
-    showCompleteModal();
+    markChallengeComplete(currentChallenge.id);
   } else {
     setStatus('fail', 'Le robot n’a pas atteint la cible. V\xe9rifie ton programme.');
   }
@@ -216,18 +213,18 @@ async function execBlock(block) {
       if (isWall(f.x, f.y))    throw new Error('Le robot a heurté un mur.');
       robot.x = f.x; robot.y = f.y;
       drawGame();
-      await sleep(380);
+      await sleep(360);
       break;
     }
     case 'turnR':
       robot.dir = (robot.dir + 1) % 4;
       drawGame();
-      await sleep(280);
+      await sleep(260);
       break;
     case 'turnL':
       robot.dir = (robot.dir + 3) % 4;
       drawGame();
-      await sleep(280);
+      await sleep(260);
       break;
     case 'repeat': {
       const n = Math.max(1, Math.min(20, block.count || 1));

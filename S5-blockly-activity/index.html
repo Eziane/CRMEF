@@ -39,13 +39,28 @@
 <!-- ===== BRIEFING ===== -->
 <section class="briefing">
   <div class="briefing-inner">
-    <div>
+    <div class="briefing-left">
       <h1>
-        <span class="level-num" id="level-num">Niveau 01</span>
-        <span id="level-title">Les séquences d'instructions</span>
+        <span class="level-num" id="level-num">Séquences · Défi 1/3</span>
+        <span id="level-title">Premiers pas</span>
       </h1>
       <p id="level-instruction">…</p>
+
+      <!-- Challenge navigation -->
+      <div class="challenge-nav" id="challenge-nav">
+        <button class="cnav-btn" id="prev-btn" title="Défi précédent">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Précédent
+        </button>
+        <div class="challenge-dots" id="challenge-dots"></div>
+        <span class="challenge-label" id="challenge-label">Défi 1 / 3</span>
+        <button class="cnav-btn" id="next-btn" title="Défi suivant">
+          Suivant
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
     </div>
+
     <div class="concept-tag" id="concept-tag">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
@@ -85,7 +100,7 @@
       <span class="badge" id="grid-size">5 × 5</span>
     </div>
     <div class="game-frame">
-      <canvas id="game" width="320" height="320"></canvas>
+      <canvas id="game" width="360" height="360"></canvas>
     </div>
     <div class="controls">
       <button class="btn btn-primary" id="run-btn">

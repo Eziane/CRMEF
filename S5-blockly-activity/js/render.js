@@ -7,7 +7,7 @@ function iconUse(id) {
 function renderToolbox() {
   const tb = document.getElementById('toolbox');
   tb.innerHTML = '';
-  const types = LEVELS[currentLevel].toolbox;
+  const types = currentChallenge.toolbox;
   document.getElementById('toolbox-count').textContent = types.length;
 
   types.forEach(type => {

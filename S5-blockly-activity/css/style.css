@@ -143,7 +143,7 @@ body::before {
 }
 .briefing-inner {
   display: grid; grid-template-columns: 1fr auto;
-  gap: 36px; align-items: end;
+  gap: 36px; align-items: start;
 }
 .briefing h1 {
   font-family: 'Fraunces', serif; font-weight: 600;
@@ -157,6 +157,51 @@ body::before {
   text-transform: uppercase;
 }
 .briefing p { color: var(--ink-2); max-width: 760px; line-height: 1.55; font-size: 15px; }
+
+/* ── Challenge navigation strip ─────────────────────────────────────────── */
+.briefing-left { display: flex; flex-direction: column; gap: 12px; }
+
+.challenge-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.cnav-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 100px;
+  border: 1px solid var(--line); background: var(--surface);
+  color: var(--ink); font-family: inherit;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all .18s var(--ease);
+}
+.cnav-btn:hover:not(:disabled) { background: var(--surface-2); border-color: var(--ink-2); }
+.cnav-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+.challenge-dots {
+  display: flex; align-items: center; gap: 7px;
+}
+
+.cdot {
+  width: 11px; height: 11px; border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  padding: 0; cursor: pointer;
+  transition: all .2s var(--ease);
+}
+.cdot:hover         { border-color: var(--accent); transform: scale(1.2); }
+.cdot.active        { border-color: var(--ink); background: var(--ink); transform: scale(1.2); }
+.cdot.done          { border-color: var(--c-if); background: var(--c-if); }
+.cdot.done.active   { border-color: var(--ink); background: var(--ink); outline: 3px solid var(--c-if); outline-offset: 2px; }
+
+.challenge-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; color: var(--muted);
+  white-space: nowrap;
+}
 
 .concept-tag {
   display: inline-flex; align-items: center; gap: 8px;

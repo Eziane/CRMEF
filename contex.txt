@@ -1,0 +1,22 @@
+🎨 Aujourd'hui : Créez une activité BLOCKLY ou un mini-jeu sérieux.
+
+📝 Consigne (choisissez A ou B) :
+
+Option A — Activité Blockly :
+1. Utilisez Blockly Games, Scratch, ou App Inventor pour créer une activité qui enseigne un concept de programmation.
+2. L'activité doit avoir au moins 3 niveaux de difficulté progressive.
+3. Chaque niveau a une consigne claire pour l'élève.
+
+Option B — Jeu sérieux :
+1. Concevez un mini-jeu éducatif (avec un outil au choix : Scratch, Genially, PowerPoint interactif, etc.).
+2. Le jeu doit avoir un objectif d'apprentissage explicite.
+3. L'élève doit prendre des décisions qui testent sa compréhension.
+
+Pour les deux options :
+✅ Testable via un lien ou un fichier exécutable
+✅ Consigne élève rédigée (ce que l'élève doit faire)
+✅ Fiche technique : outil utilisé, objectif, niveau, temps estimé
+
+📎 Déposez : Lien/fichier de l'activité + Fiche technique (1 page)
+
+💡 Si vous utilisez l'IA pour générer du code, documentez votre prompt et ce que vous avez modifié.
